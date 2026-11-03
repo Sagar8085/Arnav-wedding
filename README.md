@@ -1,6 +1,13 @@
 # Anisha & Arnav — Wedding Invitation
 
-A local React app (Vite, Tailwind CSS v4, Framer Motion). It runs only on this machine. Nothing is deployed.
+A React app (Vite, Tailwind CSS v4, Framer Motion), ready to deploy on Netlify.
+
+## Deploy on Netlify
+
+1. Sign in at https://app.netlify.com, then choose **Add new site → Import an existing project → GitHub**.
+2. Pick the `Sagar8085/Arnav-wedding` repository. `netlify.toml` fills in the build settings: `npm run build`, publish folder `dist`, Node 20.
+3. Click **Deploy**. Every later `git push` to `main` redeploys the site automatically.
+4. Optional: in **Site configuration → Change site name**, pick a name such as `anisha-arnav-wedding`.
 
 ## Run
 
