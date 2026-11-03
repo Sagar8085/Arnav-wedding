@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", "Tiro Devanagari Hindi", serif;
+  --font-display: "Cormorant Garamond", "Tiro Devanagari Hindi", serif;
+  --font-sans: "Inter", "Tiro Devanagari Hindi", sans-serif;
+  --color-maroon: #800000;
+  --color-maroon-dark: #600000;
+  --color-gold: #D4AF37;
+  --color-gold-dark: #B8860B;
+  --color-cream: #FFF8F0;
+  --color-peach: #FFEFD5;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: #FFF8F0;
+  color: #800000;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
