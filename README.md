@@ -1,6 +1,8 @@
 # Anisha & Arnav — Wedding Invitation
 
-A React app (Vite, Tailwind CSS v4, Framer Motion), ready to deploy on Netlify.
+A React app (Vite, Tailwind CSS v4, Framer Motion), deployed on Netlify.
+
+**Live:** https://anisha-and-arnav-wedding.netlify.app/?lang=en · [Hindi](https://anisha-and-arnav-wedding.netlify.app/?lang=hi)
 
 ## Deploy on Netlify
 
