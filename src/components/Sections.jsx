@@ -1,16 +1,10 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Calendar, Heart, MapPin, Sparkles, Flower2, Music, Sun, Crown, Navigation } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Calendar, CalendarCheck, Clock, Crown, Flower2, Heart, MapPin, Music, Navigation, Send, Sun } from 'lucide-react'
 import { useLanguage } from '../i18n.jsx'
 import { WEDDING } from '../config.js'
-import { CornerFrames, Divider, FallingPetals, FloatingSparkles, Mandala, Photo, SectionHeader } from './Decor.jsx'
-
-const inView = (delay = 0, y = 30) => ({
-  initial: { opacity: 0, y },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, delay },
-  viewport: { once: true },
-})
+import { CornerBranches, HeartDivider, OliveBranch, Photo, SectionTitle, reveal } from './Decor.jsx'
+import { Medallion } from './HeroIntro.jsx'
 
 export function calendarUrl() {
   const c = WEDDING.calendar
@@ -21,83 +15,240 @@ export function calendarUrl() {
   )
 }
 
-export function AddToCalendar({ dark = false }) {
-  const { t } = useLanguage()
+const btnSolid =
+  'inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-sage text-ivory font-caps text-xs tracking-[0.2em] uppercase shadow-[0_10px_25px_-10px_rgba(60,70,50,.7)] hover:bg-olive transition-colors'
+const btnOutline =
+  'inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-sage text-olive font-caps text-xs tracking-[0.2em] uppercase hover:bg-sage hover:text-ivory transition-colors'
+
+function Section({ children, className = '', id }) {
   return (
-    <motion.button
-      type="button"
-      onClick={() => window.open(calendarUrl(), '_blank', 'noopener')}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 font-medium transition-colors
-        ${dark ? 'border-gold text-gold hover:bg-gold hover:text-maroon' : 'border-gold text-maroon hover:bg-gold hover:text-white'}`}
-    >
-      <Calendar className="w-4 h-4" />
-      {t('details.add_to_calendar')}
-    </motion.button>
-  )
-}
-
-/* 1. WELCOME ------------------------------------------------------------ */
-export function Welcome() {
-  const { t } = useLanguage()
-  return (
-    <section className="min-h-screen w-full bg-cream relative flex items-center justify-center px-4 py-20 overflow-hidden">
-      <CornerFrames />
-      <FloatingSparkles count={6} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold opacity-5 blur-3xl rounded-full" />
-
-      <motion.div className="max-w-2xl mx-auto text-center relative z-10 space-y-8" {...inView(0, 50)}>
-        <motion.div initial={{ rotate: 0, opacity: 0 }} whileInView={{ rotate: 360, opacity: 1 }} transition={{ duration: 2 }} viewport={{ once: true }}>
-          <Mandala rays={8} size="w-24 h-24" bar="w-2 h-12" center="w-12 h-12 border-4 border-gold !bg-cream" spin={40} />
-        </motion.div>
-
-        <p className="text-sm uppercase tracking-[0.35em] text-gold-dark font-medium">{t('welcome.ceremony')}</p>
-        <p className="text-xl text-maroon font-light tracking-wide">{t('welcome.blessing')}</p>
-
-        <div className="space-y-5">
-          <div className="space-y-1">
-            <h2 className="text-5xl md:text-6xl font-serif text-maroon tracking-wide">{t('bride.name')}</h2>
-            <p className="text-sm md:text-base text-maroon/70">{t('bride.parents')}</p>
-            <p className="text-sm text-gold-dark">{t('bride.place')}</p>
-          </div>
-          <div className="text-3xl text-gold font-serif">&amp;</div>
-          <div className="space-y-1">
-            <h2 className="text-5xl md:text-6xl font-serif text-maroon tracking-wide">{t('groom.name')}</h2>
-            <p className="text-sm md:text-base text-maroon/70">{t('groom.parents')}</p>
-            <p className="text-sm text-gold-dark">{t('groom.place')}</p>
-          </div>
-        </div>
-
-        <p className="text-xl text-maroon font-light tracking-wide">{t('welcome.invite')}</p>
-
-        <Divider center={<><Sparkles className="w-6 h-6 text-gold" /><div className="w-3 h-3 bg-gold rounded-full" /><Sparkles className="w-6 h-6 text-gold" /></>} />
-
-        <p className="text-lg text-maroon font-serif italic opacity-70 max-w-md mx-auto">"{t('welcome.quote')}"</p>
-      </motion.div>
+    <section id={id} className={`relative w-full px-5 py-20 md:py-28 overflow-hidden ${className}`}>
+      {children}
     </section>
   )
 }
 
-/* 2. COUPLE ------------------------------------------------------------- */
-function CouplePlaceholder() {
+/* 1. WELCOME MESSAGE ------------------------------------------------------ */
+export function Welcome() {
   const { t } = useLanguage()
   return (
-    <div className="w-full aspect-[4/3] bg-gradient-to-br from-maroon via-[#6a0000] to-maroon-dark flex flex-col items-center justify-center gap-4 text-gold">
-      <Mandala rays={16} size="w-28 h-28" bar="w-1 h-14" center="w-12 h-12" spin={30} />
-      <p className="font-serif text-3xl tracking-widest">{t('bride.name')} &amp; {t('groom.name')}</p>
-      <p className="text-sm text-cream/70 tracking-wide">{t('couple.photo_soon')}</p>
+    <Section>
+      <motion.div className="max-w-2xl mx-auto text-center" {...reveal()}>
+        <HeartDivider className="mb-8" />
+        <p className="font-script text-3xl md:text-4xl leading-relaxed text-olive text-glow">
+          {t('welcome.blessing')}
+          <br />
+          {t('welcome.invite')}
+        </p>
+        <HeartDivider className="mt-8" />
+        <p className="mt-8 text-xl italic text-sage">“{t('welcome.quote')}”</p>
+      </motion.div>
+    </Section>
+  )
+}
+
+/* 2. SCRATCH CARD + SAVE THE DATE ----------------------------------------- */
+const CONFETTI = ['#b5bf9f', '#4f5a42', '#e3cf9f', '#f2ecdc', '#8a7a4e']
+
+function Confetti() {
+  const [bits] = useState(() =>
+    [...Array(46)].map((_, i) => ({
+      x: (Math.random() - 0.5) * 340,
+      y: -(Math.random() * 220 + 80),
+      r: Math.random() * 540 - 270,
+      c: CONFETTI[i % CONFETTI.length],
+      w: Math.random() * 6 + 5,
+      d: Math.random() * 0.25,
+    }))
+  )
+  return (
+    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
+      {bits.map((b, i) => (
+        <motion.span
+          key={i}
+          className="absolute rounded-sm"
+          style={{ width: b.w, height: b.w * 0.45, background: b.c }}
+          initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
+          animate={{ x: b.x, y: [0, b.y, b.y + 320], opacity: [1, 1, 0], rotate: b.r }}
+          transition={{ duration: 2.4, delay: b.d, ease: 'easeOut' }}
+        />
+      ))}
     </div>
   )
 }
 
+function ScratchCard() {
+  const { t } = useLanguage()
+  const wrapRef = useRef(null)
+  const canvasRef = useRef(null)
+  const drawing = useRef(false)
+  const moves = useRef(0)
+  const [revealed, setRevealed] = useState(false)
+
+  // Paint the sage "foil" layer
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const wrap = wrapRef.current
+    if (!canvas || !wrap) return
+    const { width, height } = wrap.getBoundingClientRect()
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = width * dpr
+    canvas.height = height * dpr
+    const ctx = canvas.getContext('2d')
+    ctx.scale(dpr, dpr)
+    const g = ctx.createLinearGradient(0, 0, width, height)
+    g.addColorStop(0, '#eee6d2')
+    g.addColorStop(0.5, '#9aa584')
+    g.addColorStop(1, '#4a5540')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, width, height)
+    for (let i = 0; i < 900; i++) {
+      const c = ['238,230,210', '154,165,132', '74,85,64', '247,242,230'][i % 4]
+      ctx.fillStyle = `rgba(${c},${Math.random() * 0.5 + 0.2})`
+      ctx.beginPath()
+      ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 1.6 + 0.3, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.fillStyle = '#f7f2e6'
+    ctx.textAlign = 'center'
+    ctx.font = '600 15px Cinzel, serif'
+    ctx.fillText(t('scratch.hint').toUpperCase(), width / 2, height / 2 + 5)
+    ctx.globalCompositeOperation = 'destination-out'
+  }, [t])
+
+  const clearedRatio = () => {
+    const c = canvasRef.current
+    const data = c.getContext('2d').getImageData(0, 0, c.width, c.height).data
+    let clear = 0
+    let total = 0
+    for (let i = 3; i < data.length; i += 4 * 40) {
+      total++
+      if (data[i] === 0) clear++
+    }
+    return clear / total
+  }
+
+  const scratch = (e) => {
+    if (!drawing.current || revealed) return
+    const c = canvasRef.current
+    const rect = c.getBoundingClientRect()
+    const ctx = c.getContext('2d')
+    ctx.beginPath()
+    ctx.arc(e.clientX - rect.left, e.clientY - rect.top, 24, 0, Math.PI * 2)
+    ctx.fill()
+    if (++moves.current % 12 === 0 && clearedRatio() > 0.45) setRevealed(true)
+  }
+
+  return (
+    <div ref={wrapRef} className="relative w-full max-w-sm mx-auto aspect-[4/3] rounded-2xl overflow-hidden paper-card">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-1 p-6">
+        <p className="font-script text-3xl text-sage">{t('scratch.title')}</p>
+        <p className="font-caps text-4xl md:text-5xl text-olive-dark tracking-wider">19</p>
+        <p className="font-caps text-lg tracking-[0.3em] text-olive">{t('scratch.month')}</p>
+        <p className="font-caps text-sm tracking-[0.3em] text-sage">{t('scratch.day')}</p>
+        <p className="mt-2 inline-flex items-center gap-1.5 text-base italic text-sage"><Clock size={15} />{t('details.date_note')}</p>
+      </div>
+      <motion.canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full cursor-pointer touch-none"
+        animate={{ opacity: revealed ? 0 : 1 }}
+        transition={{ duration: 0.8 }}
+        style={{ pointerEvents: revealed ? 'none' : 'auto' }}
+        onPointerDown={(e) => { drawing.current = true; e.currentTarget.setPointerCapture(e.pointerId); scratch(e) }}
+        onPointerMove={scratch}
+        onPointerUp={() => { drawing.current = false }}
+        onPointerCancel={() => { drawing.current = false }}
+      />
+      {revealed && <Confetti />}
+    </div>
+  )
+}
+
+export function SaveTheDate() {
+  const { t } = useLanguage()
+  return (
+    <Section>
+      <div className="max-w-3xl mx-auto">
+        <SectionTitle label={t('details.date_label')} title={t('save.title')} />
+        <motion.div {...reveal(0.15)}>
+          <ScratchCard />
+        </motion.div>
+        <motion.div {...reveal(0.3)} className="mt-10 text-center space-y-4">
+          <p className="italic text-lg text-sage">{t('save.note')}</p>
+          <a href={calendarUrl()} target="_blank" rel="noopener noreferrer" className={btnSolid}>
+            <CalendarCheck size={16} />
+            {t('details.add_to_calendar')}
+          </a>
+        </motion.div>
+      </div>
+    </Section>
+  )
+}
+
+/* 3. COUNTDOWN ------------------------------------------------------------- */
+const TARGET = new Date('2027-01-19T19:00:00+05:30').getTime()
+
+function useCountdown() {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  const diff = Math.max(0, TARGET - now)
+  return {
+    done: diff === 0,
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor(diff / 3600000) % 24,
+    minutes: Math.floor(diff / 60000) % 60,
+    seconds: Math.floor(diff / 1000) % 60,
+  }
+}
+
+export function Countdown() {
+  const { t } = useLanguage()
+  const c = useCountdown()
+  const units = [
+    ['days', c.days],
+    ['hours', c.hours],
+    ['minutes', c.minutes],
+    ['seconds', c.seconds],
+  ]
+  return (
+    <Section className="bg-sage text-ivory">
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #f7f2e6 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
+      <OliveBranch className="absolute -left-12 top-6 w-64 rotate-[20deg] opacity-30" color="#e9dec7" berry="#e3cf9f" />
+      <OliveBranch className="absolute -right-12 bottom-6 w-64 -scale-x-100 rotate-[20deg] opacity-30" color="#e9dec7" berry="#e3cf9f" />
+      <div className="relative max-w-3xl mx-auto">
+        <SectionTitle light label={t('date.short')} title={t('countdown.title')} />
+        {c.done ? (
+          <p className="text-center font-script text-4xl">{t('countdown.done')}</p>
+        ) : (
+          <motion.div {...reveal(0.2)} className="grid grid-cols-4 gap-3 md:gap-6 max-w-xl mx-auto">
+            {units.map(([k, v]) => (
+              <div key={k} className="rounded-2xl border border-ivory/30 bg-ivory/10 backdrop-blur-sm py-4 md:py-6 text-center">
+                <motion.p key={v} initial={{ opacity: 0.4, y: -6 }} animate={{ opacity: 1, y: 0 }} className="font-caps text-3xl md:text-5xl text-ivory">
+                  {String(v).padStart(2, '0')}
+                </motion.p>
+                <p className="mt-1 font-caps text-[10px] md:text-xs tracking-[0.2em] uppercase text-gold-light">{t(`countdown.${k}`)}</p>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </div>
+    </Section>
+  )
+}
+
+/* 4. COUPLE ---------------------------------------------------------------- */
 function PersonCard({ label, name, parents, place, delay }) {
   return (
-    <motion.div {...inView(delay)} whileHover={{ y: -5 }} className="bg-white rounded-2xl p-6 shadow-xl border border-gold/20 text-center space-y-2">
-      <p className="text-xs uppercase tracking-[0.3em] text-gold-dark font-semibold">{label}</p>
-      <h3 className="text-3xl font-serif text-maroon">{name}</h3>
-      <p className="text-maroon/70">{parents}</p>
-      <p className="inline-flex items-center gap-1 text-sm text-gold-dark"><MapPin className="w-4 h-4" />{place}</p>
+    <motion.div {...reveal(delay)} className="paper-card rounded-t-full rounded-b-3xl px-6 pt-14 pb-8 text-center space-y-2">
+      <Heart size={18} className="mx-auto text-bronze" fill="currentColor" />
+      <p className="font-caps text-xs tracking-[0.35em] uppercase text-bronze">{label}</p>
+      <h3 className="font-script text-5xl text-olive">{name}</h3>
+      <HeartDivider width="w-10" size={8} color="#6b7d55" />
+      <p className="text-lg text-sage leading-snug">{parents}</p>
+      <p className="inline-flex items-center gap-1 text-base italic text-bronze"><MapPin size={15} />{place}</p>
     </motion.div>
   )
 }
@@ -105,345 +256,271 @@ function PersonCard({ label, name, parents, place, delay }) {
 export function Couple() {
   const { t } = useLanguage()
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-cream to-peach relative py-20 px-4 overflow-hidden">
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle, #D4AF37 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-      <FallingPetals count={15} />
+    <Section>
+      <div className="max-w-4xl mx-auto">
+        <SectionTitle label={t('couple.subtitle')} title={t('couple.title')} />
 
-      <div className="max-w-5xl mx-auto relative z-10">
-        <SectionHeader icon={<Mandala rays={12} className="mb-4" />} title={t('couple.title')} subtitle={t('couple.subtitle')} />
-
-        <motion.div
-          className="relative max-w-2xl mx-auto"
-          initial={{ opacity: 0, scale: 0.9, y: 50 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
-            <div className="absolute inset-0 border-8 border-gold rounded-3xl z-10 pointer-events-none" />
-            <CornerFrames size="w-12 h-12 md:w-16 md:h-16" variant="inner" opacity={1} />
-            <motion.div className="absolute top-8 right-8 z-20" animate={{ scale: [1, 1.5, 1], rotate: [0, 180, 360], opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity }}>
-              <Sparkles className="w-8 h-8 text-gold" />
-            </motion.div>
-            <motion.div className="absolute bottom-8 left-8 z-20" animate={{ scale: [1, 1.5, 1], rotate: [360, 180, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}>
-              <Sparkles className="w-8 h-8 text-gold" />
-            </motion.div>
-            <Photo src={WEDDING.photos.couple} alt={`${t('bride.name')} & ${t('groom.name')}`} className="w-full h-auto object-cover" fallback={<CouplePlaceholder />} />
-            <div className="absolute inset-0 bg-gradient-to-t from-maroon/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <motion.div {...reveal(0.1)} className="relative max-w-md mx-auto mb-14">
+          <div className="rounded-t-full overflow-hidden p-2 paper-card">
+            <Photo
+              src={WEDDING.photos.couple}
+              alt={`${t('bride.name')} & ${t('groom.name')}`}
+              className="w-full aspect-[3/4] object-cover rounded-t-full"
+              fallback={
+                <div className="w-full aspect-[3/4] rounded-t-full bg-gradient-to-b from-sage-light/50 via-linen to-ivory flex flex-col items-center justify-center gap-4">
+                  <OliveBranch className="w-44" />
+                  <p className="font-script text-5xl text-olive">{t('bride.name')} &amp; {t('groom.name')}</p>
+                  <p className="italic text-sage">{t('couple.photo_soon')}</p>
+                  <OliveBranch className="w-44 rotate-180" />
+                </div>
+              }
+            />
           </div>
-          <motion.div className="absolute -top-8 left-1/2 -translate-x-1/2 z-30" animate={{ y: [0, -15, 0], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-            <div className="w-16 h-16 bg-gradient-to-br from-gold to-gold-dark rounded-full flex items-center justify-center shadow-2xl border-4 border-white">
-              <Heart className="w-8 h-8 text-white fill-white" />
-            </div>
-          </motion.div>
         </motion.div>
 
-        <div className="grid md:grid-cols-[1fr_auto_1fr] items-center gap-6 mt-12 max-w-3xl mx-auto">
-          <PersonCard label={t('bride.label')} name={t('bride.name')} parents={t('bride.parents')} place={t('bride.place')} delay={0.2} />
-          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="mx-auto">
-            <Heart className="w-10 h-10 text-gold fill-gold" />
+        <div className="grid md:grid-cols-[1fr_auto_1fr] items-center gap-6">
+          <PersonCard label={t('bride.label')} name={t('bride.name')} parents={t('bride.parents')} place={t('bride.place')} delay={0.1} />
+          <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="mx-auto font-script text-5xl text-bronze">
+            &amp;
           </motion.div>
-          <PersonCard label={t('groom.label')} name={t('groom.name')} parents={t('groom.parents')} place={t('groom.place')} delay={0.4} />
+          <PersonCard label={t('groom.label')} name={t('groom.name')} parents={t('groom.parents')} place={t('groom.place')} delay={0.25} />
         </div>
 
-        <motion.p {...inView(0.5)} className="text-center text-lg md:text-xl text-maroon/80 max-w-3xl mx-auto leading-relaxed px-4 mt-10">
-          {t('couple.description')}
-        </motion.p>
+        <motion.p {...reveal(0.3)} className="mt-12 text-center text-xl italic text-sage max-w-2xl mx-auto">{t('couple.description')}</motion.p>
       </div>
-    </section>
+    </Section>
   )
 }
 
-/* 3. DETAILS ------------------------------------------------------------ */
-function DetailCard({ icon, label, value, note, delay, bgImage, children }) {
-  const [bgOk, setBgOk] = useState(true)
+/* 5. PROGRAM TIMELINE ------------------------------------------------------ */
+function EventCard({ icon, title, time, desc, delay }) {
   return (
-    <motion.div
-      className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden group"
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.5, delay }}
-      viewport={{ once: true }}
-    >
-      {bgImage && bgOk ? (
-        <>
-          <img src={bgImage} alt="" className="hidden" onError={() => setBgOk(false)} />
-          <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url("${bgImage}")` }} />
-          <div className="absolute inset-0 bg-white/60" />
-        </>
-      ) : (
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #D4AF37 0px, #D4AF37 1px, transparent 1px, transparent 20px)' }} />
-      )}
-      <div className="relative z-10 flex flex-col items-center gap-3 text-center">
-        <motion.div whileHover={{ rotate: 360, scale: 1.1 }} transition={{ duration: 0.6 }} className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-white shadow-lg">
-          {icon}
-        </motion.div>
-        <p className="text-sm uppercase tracking-wider text-maroon/60 font-medium">{label}</p>
-        <p className="text-2xl font-serif text-maroon">{value}</p>
-        {note && <p className="text-maroon/70">{note}</p>}
-        {children && <div className="pt-2 flex flex-wrap gap-3 justify-center">{children}</div>}
+    <motion.div {...reveal(delay)} className="relative pl-16">
+      <div className="absolute left-0 top-2 w-12 h-12 rounded-full bg-sage text-ivory flex items-center justify-center border-4 border-ivory shadow-md">{icon}</div>
+      <div className="paper-card rounded-2xl p-6">
+        <p className="inline-flex items-center gap-1.5 font-caps text-xs tracking-[0.2em] uppercase text-bronze"><Clock size={13} />{time}</p>
+        <h3 className="mt-1 font-script text-4xl text-olive">{title}</h3>
+        <p className="mt-2 text-lg text-sage leading-relaxed">{desc}</p>
       </div>
     </motion.div>
   )
 }
 
-export function Details() {
-  const { t } = useLanguage()
+function DayBadge({ children }) {
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-peach via-cream to-peach relative py-20 px-4 overflow-hidden">
-      <div className="absolute -top-40 -right-40 opacity-10 pointer-events-none">
-        <Mandala rays={24} size="w-[28rem] h-[28rem]" bar="w-1 h-56" center="w-20 h-20" spin={60} />
-      </div>
-      <FloatingSparkles count={8} />
-
-      <div className="max-w-5xl mx-auto relative z-10">
-        <SectionHeader
-          icon={<motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}><Sparkles className="w-10 h-10 text-gold mx-auto" /></motion.div>}
-          title={t('details.title')}
-          subtitle={t('details.subtitle')}
-        />
-
-        <div className="grid md:grid-cols-2 gap-6 mb-10">
-          <DetailCard icon={<Calendar className="w-7 h-7" />} label={t('details.date_label')} value={t('details.date_value')} note={t('details.date_note')} delay={0.2}>
-            <AddToCalendar />
-          </DetailCard>
-          <DetailCard icon={<MapPin className="w-7 h-7" />} label={t('details.venue_label')} value={t('details.venue_value')} delay={0.4} bgImage={WEDDING.photos.venue}>
-            <motion.a
-              href={WEDDING.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-white font-medium shadow-lg"
-            >
-              <Navigation className="w-4 h-4" />
-              {t('details.open_map')}
-            </motion.a>
-          </DetailCard>
-        </div>
-
-        <motion.div {...inView(0.6, 50)} className="relative bg-white rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden">
-          <CornerFrames size="w-16 h-16 md:w-20 md:h-20" />
-          <div className="text-center space-y-6 relative z-10">
-            <motion.div whileHover={{ scale: 1.05 }} className="mx-auto w-32 h-32 rounded-full border-4 border-gold bg-gradient-to-br from-maroon to-maroon-dark flex items-center justify-center shadow-xl overflow-hidden">
-              <video src={WEDDING.ganeshVideo} autoPlay loop muted playsInline className="w-[180%] h-auto max-w-none" />
-            </motion.div>
-            <p className="text-gold-dark tracking-widest">{t('intro.blessing')}</p>
-            <h3 className="text-3xl md:text-4xl font-serif text-maroon">{t('details.blessing_title')}</h3>
-            <p className="text-lg text-maroon/70 max-w-2xl mx-auto leading-relaxed">{t('details.blessing_desc')}</p>
-            <Divider />
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-/* 4. SCHEDULE ----------------------------------------------------------- */
-function ScheduleItem({ icon, title, time, place, description, delay }) {
-  return (
-    <motion.div className="flex gap-6" initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay }} viewport={{ once: true }}>
-      <div className="relative flex flex-col items-center">
-        <motion.div whileHover={{ scale: 1.1, rotate: 360 }} transition={{ duration: 0.6 }} className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-white shadow-lg z-10 relative shrink-0">
-          {icon}
-        </motion.div>
-        <motion.div className="absolute top-0 w-16 h-16 rounded-full bg-gold" animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} />
-        <div className="flex-1 w-0.5 bg-gradient-to-b from-gold to-transparent mt-2" />
-      </div>
-      <motion.div className="flex-1 pb-10" whileHover={{ x: 10 }} transition={{ duration: 0.3 }}>
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gold/20">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
-            <span className="text-gold-dark font-semibold">{time}</span>
-            <span className="inline-flex items-center gap-1 text-sm text-maroon/60"><MapPin className="w-3.5 h-3.5" />{place}</span>
-          </div>
-          <h3 className="text-2xl font-serif text-maroon mb-2">{title}</h3>
-          <p className="text-maroon/70 leading-relaxed">{description}</p>
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-function DayHeading({ children }) {
-  return (
-    <motion.div {...inView(0.1)} className="flex items-center gap-4 mb-8">
-      <div className="px-5 py-2 rounded-full bg-maroon text-gold font-serif text-xl shadow-lg">{children}</div>
-      <div className="h-px flex-1 bg-gradient-to-r from-gold to-transparent" />
+    <motion.div {...reveal()} className="flex items-center gap-4 mb-6">
+      <div className="px-5 py-2 rounded-full border border-sage bg-ivory font-caps text-sm tracking-[0.2em] text-olive">{children}</div>
+      <div className="h-px flex-1 bg-gradient-to-r from-moss/60 to-transparent" />
     </motion.div>
   )
 }
 
 export function Schedule() {
   const { t } = useLanguage()
-  const place = t('schedule.at_venue')
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-cream to-peach relative py-20 px-4 overflow-hidden">
-      <div className="absolute -bottom-32 -left-32 opacity-10 pointer-events-none">
-        <Mandala rays={16} size="w-96 h-96" bar="w-1 h-48" center="w-16 h-16" spin={30} />
+    <Section>
+      <div className="max-w-2xl mx-auto">
+        <SectionTitle label={t('schedule.subtitle')} title={t('schedule.title')} />
+        <div className="relative">
+          <div className="absolute left-6 top-16 bottom-6 w-px bg-gradient-to-b from-moss/60 via-moss/30 to-transparent" />
+          <DayBadge>{t('schedule.day1')}</DayBadge>
+          <div className="space-y-6 mb-12">
+            <EventCard icon={<Flower2 size={20} />} title={t('schedule.mehndi')} time={t('schedule.mehndi_time')} desc={t('schedule.mehndi_desc')} delay={0.1} />
+            <EventCard icon={<Music size={20} />} title={t('schedule.sangeet')} time={t('schedule.sangeet_time')} desc={t('schedule.sangeet_desc')} delay={0.2} />
+          </div>
+          <DayBadge>{t('schedule.day2')}</DayBadge>
+          <div className="space-y-6">
+            <EventCard icon={<Sun size={20} />} title={t('schedule.haldi')} time={t('schedule.haldi_time')} desc={t('schedule.haldi_desc')} delay={0.1} />
+            <EventCard icon={<Crown size={20} />} title={t('schedule.baraat')} time={t('schedule.baraat_time')} desc={t('schedule.baraat_desc')} delay={0.2} />
+          </div>
+        </div>
       </div>
-      <FloatingSparkles count={6} className="w-5 h-5 text-gold/60" />
-
-      <div className="max-w-3xl mx-auto relative z-10">
-        <SectionHeader
-          icon={<motion.div className="text-5xl" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>🌺</motion.div>}
-          title={t('schedule.title')}
-          subtitle={t('schedule.subtitle')}
-        />
-
-        <DayHeading>{t('schedule.day1')}</DayHeading>
-        <ScheduleItem icon={<Flower2 className="w-8 h-8" />} title={t('schedule.mehndi')} time={t('schedule.mehndi_time')} place={place} description={t('schedule.mehndi_desc')} delay={0.2} />
-        <ScheduleItem icon={<Music className="w-8 h-8" />} title={t('schedule.sangeet')} time={t('schedule.sangeet_time')} place={place} description={t('schedule.sangeet_desc')} delay={0.3} />
-
-        <div className="mt-6" />
-        <DayHeading>{t('schedule.day2')}</DayHeading>
-        <ScheduleItem icon={<Sun className="w-8 h-8" />} title={t('schedule.haldi')} time={t('schedule.haldi_time')} place={place} description={t('schedule.haldi_desc')} delay={0.2} />
-        <ScheduleItem icon={<Crown className="w-8 h-8" />} title={t('schedule.baraat')} time={t('schedule.baraat_time')} place={place} description={t('schedule.baraat_desc')} delay={0.3} />
-      </div>
-    </section>
+    </Section>
   )
 }
 
-/* 5. CELEBRATION -------------------------------------------------------- */
-function Fireworks({ count = 15 }) {
-  const [items] = useState(() => [...Array(count)].map(() => ({ x: Math.random() * 100, y: Math.random() * 60, d: Math.random() * 3 })))
-  return (
-    <div className="absolute inset-0 pointer-events-none">
-      {items.map((f, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={{ left: `${f.x}%`, top: `${f.y}%` }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [0, 2, 0], opacity: [0, 1, 0] }}
-          transition={{ duration: 2, repeat: Infinity, delay: f.d, ease: 'easeOut' }}
-        >
-          {[...Array(8)].map((_, j) => (
-            <div key={j} className="absolute w-6 h-0.5 bg-gradient-to-r from-gold to-transparent origin-left" style={{ transform: `rotate(${j * 45}deg)` }} />
-          ))}
-        </motion.div>
-      ))}
-    </div>
-  )
-}
-
-export function Celebration() {
+/* 6. VENUE ----------------------------------------------------------------- */
+export function Venue() {
   const { t } = useLanguage()
-  const glow = { textShadow: ['0 0 20px rgba(212,175,55,.5)', '0 0 40px rgba(212,175,55,.8)', '0 0 20px rgba(212,175,55,.5)'] }
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-peach via-maroon to-maroon-dark relative overflow-hidden flex items-center justify-center py-20 px-4">
-      <Fireworks />
-      <FallingPetals count={25} className="w-3 h-3 bg-gradient-to-br from-gold to-pink-300 opacity-70" minDur={5} spread={3} />
-      <FloatingSparkles count={12} className="w-4 h-4 text-gold" />
-
-      <div className="max-w-3xl mx-auto text-center relative z-10 space-y-10">
-        <motion.div className="flex items-end justify-center gap-4" initial={{ opacity: 0, scale: 0.5 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} viewport={{ once: true }}>
-          <motion.div className="w-20 h-36 bg-gradient-to-b from-gold to-gold-dark rounded-t-full opacity-90 shadow-2xl" animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} />
-          <div className="relative h-36 w-10">
-            <motion.div className="absolute bottom-16 left-1" animate={{ scale: [1, 1.3, 1], y: [0, -20, -40], opacity: [1, 0.5, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}>
-              <Heart className="w-8 h-8 text-gold fill-gold" />
-            </motion.div>
-          </div>
-          <motion.div className="w-24 h-44 bg-gradient-to-b from-gold to-gold-dark rounded-t-full opacity-90 shadow-2xl" animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} />
-        </motion.div>
-
-        <motion.div {...inView(0.5)} className="space-y-6">
-          <motion.h2 className="text-4xl md:text-6xl font-serif text-gold" animate={glow} transition={{ duration: 2, repeat: Infinity }}>
-            {t('celebration.title1')}
-          </motion.h2>
-          <motion.h3 className="text-3xl md:text-5xl font-serif text-cream" animate={{ opacity: [0.9, 1, 0.9] }} transition={{ duration: 2, repeat: Infinity }}>
-            {t('celebration.title2')}
-          </motion.h3>
-          <motion.div className="flex justify-center" animate={{ rotate: [0, 360], scale: [1, 1.2, 1] }} transition={{ duration: 4, repeat: Infinity }}>
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-2xl">
-              <Heart className="w-8 h-8 text-white fill-white" />
-            </div>
-          </motion.div>
-          <p className="text-xl md:text-2xl text-cream/90 max-w-2xl mx-auto leading-relaxed">
-            {t('celebration.message')}
-            <br />
-            {t('celebration.see_you')}
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-gold" />
-            {['🌟', '💫', '✨'].map((e, i) => (
-              <motion.span key={e} className="text-2xl" animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.3 }}>{e}</motion.span>
-            ))}
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-gold" />
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-/* 6. THANK YOU ---------------------------------------------------------- */
-export function ThankYou() {
-  const { t } = useLanguage()
-  const [hearts] = useState(() => [...Array(12)].map(() => ({ x: Math.random() * 100, y: Math.random() * 100 })))
-  return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-maroon-dark via-maroon to-[#4a0000] relative overflow-hidden flex items-center justify-center py-20 px-4">
-      <motion.div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full bg-gold blur-3xl" animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.16, 0.08] }} transition={{ duration: 4, repeat: Infinity }} />
-      {hearts.map((h, i) => (
-        <motion.div key={i} className="absolute pointer-events-none" style={{ left: `${h.x}%`, top: `${h.y}%` }} animate={{ y: [0, -50, 0], opacity: [0.2, 0.6, 0.2], scale: [1, 1.2, 1] }} transition={{ duration: 4, repeat: Infinity, delay: i * 0.4 }}>
-          <Heart className="w-5 h-5 text-gold/60 fill-gold/30" />
-        </motion.div>
-      ))}
-      <FloatingSparkles count={10} className="w-4 h-4 text-gold" />
-
-      <div className="max-w-3xl mx-auto text-center relative z-10 space-y-10">
-        <motion.div initial={{ opacity: 0, scale: 0, rotate: 0 }} whileInView={{ opacity: 1, scale: 1, rotate: 360 }} transition={{ duration: 1.5 }} viewport={{ once: true }} className="relative w-32 h-32 mx-auto">
-          <Mandala rays={16} size="w-32 h-32" bar="w-1 h-16" center="w-0 h-0" spin={20} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-2xl">
-              <Heart className="w-8 h-8 text-white fill-white" />
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div {...inView(0.3)} className="space-y-8">
-          <motion.h2 className="text-5xl md:text-7xl font-serif text-gold" animate={{ textShadow: ['0 0 20px rgba(212,175,55,.5)', '0 0 40px rgba(212,175,55,.8)', '0 0 20px rgba(212,175,55,.5)'] }} transition={{ duration: 3, repeat: Infinity }}>
-            {t('thankyou.title')}
-          </motion.h2>
-
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <div className="flex flex-col">
-              <span className="text-4xl font-serif text-cream">{t('bride.name')}</span>
-              <span className="text-sm text-gold/80">{t('bride.parents')}</span>
-            </div>
-            <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
-              <Heart className="w-8 h-8 text-gold fill-gold" />
-            </motion.div>
-            <div className="flex flex-col">
-              <span className="text-4xl font-serif text-cream">{t('groom.name')}</span>
-              <span className="text-sm text-gold/80">{t('groom.parents')}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 text-2xl">
-            <div className="h-px w-20 bg-gradient-to-r from-transparent to-gold" />
-            <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 2, repeat: Infinity }}>✨</motion.span>
-            <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>🌸</motion.span>
-            <motion.span animate={{ rotate: [360, 0] }} transition={{ duration: 2, repeat: Infinity }}>✨</motion.span>
-            <div className="h-px w-20 bg-gradient-to-l from-transparent to-gold" />
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-3xl md:text-4xl font-serif text-cream">{t('thankyou.see_you')}</h3>
-            <p className="text-2xl md:text-3xl text-gold font-bold tracking-widest">{t('thankyou.datetime')}</p>
-            <p className="inline-flex items-center gap-2 text-lg text-cream/80"><MapPin className="w-5 h-5 text-gold" />{t('thankyou.location')}</p>
-            <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <AddToCalendar dark />
-              <a href={WEDDING.mapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-white font-medium shadow-lg hover:scale-105 transition-transform">
-                <Navigation className="w-4 h-4" />
-                {t('details.open_map')}
+    <Section>
+      <div className="max-w-2xl mx-auto">
+        <SectionTitle label={t('details.venue_label')} title={t('venue.title')} />
+        <motion.div {...reveal(0.1)} className="paper-card rounded-3xl overflow-hidden">
+          <Photo
+            src={WEDDING.photos.venue}
+            alt={t('details.venue_value')}
+            className="w-full aspect-[16/9] object-cover"
+            fallback={
+              <div className="w-full aspect-[16/9] bg-gradient-to-br from-sage to-olive flex items-center justify-center">
+                <MapPin size={56} className="text-gold-light" />
+              </div>
+            }
+          />
+          <div className="p-8 text-center space-y-3">
+            <h3 className="font-script text-4xl md:text-5xl text-olive">{t('details.venue_value')}</h3>
+            <p className="inline-flex items-center gap-1.5 italic text-lg text-sage"><Calendar size={16} />{t('thankyou.datetime')}</p>
+            <div className="pt-3 flex flex-wrap justify-center gap-3">
+              <a href={WEDDING.mapsUrl} target="_blank" rel="noopener noreferrer" className={btnSolid}>
+                <Navigation size={15} />
+                {t('label.view_maps')}
+              </a>
+              <a href={calendarUrl()} target="_blank" rel="noopener noreferrer" className={btnOutline}>
+                <CalendarCheck size={15} />
+                {t('details.add_to_calendar')}
               </a>
             </div>
           </div>
-
-          <p className="text-lg md:text-xl font-serif italic text-white/90 max-w-2xl mx-auto leading-relaxed">{t('thankyou.quote')}</p>
         </motion.div>
       </div>
-    </section>
+    </Section>
+  )
+}
+
+/* 7. BLESSING -------------------------------------------------------------- */
+export function Blessing() {
+  const { t } = useLanguage()
+  return (
+    <Section>
+      <motion.div {...reveal()} className="relative max-w-2xl mx-auto paper-card rounded-3xl px-6 py-14 text-center overflow-hidden">
+        <CornerBranches size="w-28 md:w-36" opacity={0.45} />
+        <div className="relative flex flex-col items-center gap-5">
+          <Medallion size="w-28 h-28" />
+          <p className="font-caps text-sm tracking-[0.25em] text-bronze">{t('intro.blessing')}</p>
+          <h3 className="font-script text-4xl md:text-5xl text-olive">{t('details.blessing_title')}</h3>
+          <p className="text-lg text-sage max-w-lg leading-relaxed">{t('details.blessing_desc')}</p>
+          <HeartDivider />
+        </div>
+      </motion.div>
+    </Section>
+  )
+}
+
+/* 8. RSVP (Netlify Forms) -------------------------------------------------- */
+const EVENTS = ['mehndi', 'sangeet', 'haldi', 'baraat']
+
+export function Rsvp() {
+  const { t } = useLanguage()
+  const [form, setForm] = useState({ name: '', attending: '', guests: '1', events: [], message: '' })
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [error, setError] = useState('')
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+  const toggleEvent = (e) => set('events', form.events.includes(e) ? form.events.filter((x) => x !== e) : [...form.events, e])
+
+  const submit = async (ev) => {
+    ev.preventDefault()
+    if (!form.attending) return setError(t('rsvp.err_attending'))
+    if (form.attending === 'yes' && form.events.length === 0) return setError(t('rsvp.err_events'))
+    setError('')
+    setStatus('sending')
+    try {
+      const body = new URLSearchParams({
+        'form-name': 'rsvp',
+        name: form.name,
+        attending: form.attending,
+        guests: form.attending === 'yes' ? form.guests : '0',
+        events: form.events.join(', '),
+        message: form.message,
+      })
+      const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
+      if (!res.ok) throw new Error(String(res.status))
+      setStatus('sent')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  const field = 'w-full rounded-xl border border-line bg-ivory/80 px-4 py-3 text-lg text-olive placeholder:text-sage/60 focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20'
+  const choice = (active) =>
+    `flex-1 rounded-xl border px-4 py-3 text-lg transition-colors ${active ? 'bg-sage text-ivory border-sage' : 'bg-ivory/80 border-line text-olive hover:border-sage'}`
+
+  return (
+    <Section id="rsvp">
+      <div className="max-w-xl mx-auto">
+        <SectionTitle label={t('rsvp.label')} title={t('rsvp.title')} subtitle={t('rsvp.subtitle')} />
+        <motion.div {...reveal(0.1)} className="paper-card rounded-3xl p-6 md:p-10">
+          <AnimatePresence mode="wait">
+            {status === 'sent' ? (
+              <motion.div key="sent" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-10 space-y-4">
+                <Heart size={40} className="mx-auto text-sage" fill="currentColor" />
+                <p className="font-script text-4xl text-olive">{t('rsvp.sent')}</p>
+                <p className="italic text-sage">{t('rsvp.sent_note')}</p>
+              </motion.div>
+            ) : (
+              <motion.form key="form" onSubmit={submit} className="space-y-6" exit={{ opacity: 0 }}>
+                <label className="block space-y-2">
+                  <span className="font-caps text-xs tracking-[0.2em] uppercase text-bronze">{t('rsvp.name')}</span>
+                  <input required value={form.name} onChange={(e) => set('name', e.target.value)} className={field} autoComplete="name" />
+                </label>
+
+                <div className="space-y-2">
+                  <span className="font-caps text-xs tracking-[0.2em] uppercase text-bronze">{t('rsvp.attending')}</span>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button type="button" className={choice(form.attending === 'yes')} onClick={() => set('attending', 'yes')}>{t('rsvp.yes')}</button>
+                    <button type="button" className={choice(form.attending === 'no')} onClick={() => set('attending', 'no')}>{t('rsvp.no')}</button>
+                  </div>
+                </div>
+
+                {form.attending === 'yes' && (
+                  <>
+                    <label className="block space-y-2">
+                      <span className="font-caps text-xs tracking-[0.2em] uppercase text-bronze">{t('rsvp.guests')}</span>
+                      <select value={form.guests} onChange={(e) => set('guests', e.target.value)} className={field}>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </label>
+                    <div className="space-y-2">
+                      <span className="font-caps text-xs tracking-[0.2em] uppercase text-bronze">{t('rsvp.events')}</span>
+                      <div className="grid grid-cols-2 gap-3">
+                        {EVENTS.map((e) => (
+                          <button key={e} type="button" className={choice(form.events.includes(e))} onClick={() => toggleEvent(e)}>
+                            {t(`schedule.${e}`)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <label className="block space-y-2">
+                  <span className="font-caps text-xs tracking-[0.2em] uppercase text-bronze">{t('rsvp.message')}</span>
+                  <textarea rows={3} value={form.message} onChange={(e) => set('message', e.target.value)} className={field} />
+                </label>
+
+                {error && <p className="text-base text-red-800">{error}</p>}
+                {status === 'error' && <p className="text-base text-red-800">{t('rsvp.error')}</p>}
+
+                <button type="submit" disabled={status === 'sending'} className={`${btnSolid} w-full disabled:opacity-60`}>
+                  <Send size={15} />
+                  {status === 'sending' ? t('rsvp.sending') : t('rsvp.send')}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </Section>
+  )
+}
+
+/* 9. THANK YOU ------------------------------------------------------------- */
+export function ThankYou() {
+  const { t } = useLanguage()
+  return (
+    <Section className="bg-olive text-ivory min-h-[80svh] flex items-center">
+      <OliveBranch className="absolute top-6 left-1/2 -translate-x-1/2 w-72 opacity-40" color="#e9dec7" berry="#e3cf9f" />
+      <OliveBranch className="absolute bottom-6 left-1/2 -translate-x-1/2 w-72 rotate-180 opacity-40" color="#e9dec7" berry="#e3cf9f" />
+      <motion.div {...reveal()} className="relative max-w-2xl mx-auto text-center space-y-6">
+        <p className="font-caps text-xs tracking-[0.35em] uppercase text-gold-light">{t('thankyou.see_you')}</p>
+        <h2 className="font-script text-6xl md:text-7xl">{t('thankyou.title')}</h2>
+        <HeartDivider color="#e3cf9f" />
+        <p className="font-script text-4xl md:text-5xl">
+          {t('bride.name')} <span className="text-gold-light">&amp;</span> {t('groom.name')}
+        </p>
+        <p className="font-caps tracking-[0.2em] text-gold-light">{t('thankyou.datetime')}</p>
+        <p className="inline-flex items-center gap-1.5 text-lg italic text-ivory/80"><MapPin size={16} />{t('thankyou.location')}</p>
+        <p className="pt-4 text-lg md:text-xl italic text-ivory/85 leading-relaxed">{t('thankyou.quote')}</p>
+      </motion.div>
+    </Section>
   )
 }

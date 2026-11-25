@@ -1,172 +1,139 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Heart, Sparkles } from 'lucide-react'
+import { useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronDown, Heart } from 'lucide-react'
 import { useLanguage } from '../i18n.jsx'
 import { WEDDING } from '../config.js'
-import { FallingPetals } from './Decor.jsx'
+import { FallingLeaves, HeartDivider, OliveBranch } from './Decor.jsx'
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+const ease = [0.16, 1, 0.3, 1]
 
-function Door({ side, stage }) {
-  const open = stage !== 'initial' && stage !== 'doors'
-  const isLeft = side === 'left'
+function Medallion({ size = 'w-36 h-36 md:w-44 md:h-44' }) {
   return (
-    <motion.div
-      className={`absolute top-0 w-1/2 h-full ${isLeft ? 'left-0 origin-left' : 'right-0 origin-right'}`}
-      initial={{ rotateY: 0 }}
-      animate={{ rotateY: open ? (isLeft ? -90 : 90) : 0 }}
-      transition={{ duration: 2, ease: 'easeInOut' }}
-      style={{ transformStyle: 'preserve-3d', transformPerspective: 1000 }}
-    >
-      <div
-        className={`w-full h-full border-4 border-gold relative overflow-hidden flex items-center justify-center
-          ${isLeft ? 'bg-gradient-to-r rounded-l-lg' : 'bg-gradient-to-l rounded-r-lg'} from-maroon to-maroon-dark`}
-      >
-        <div className="absolute inset-0 opacity-25 flex flex-col items-center justify-center gap-8">
-          <Sparkles className="w-12 h-12 text-gold" />
-          <div className="w-28 h-28 border-2 border-gold rounded-full" />
-          <Sparkles className="w-12 h-12 text-gold" />
-        </div>
-        <div className={`absolute top-1/2 -translate-y-1/2 w-5 h-16 bg-gold rounded-full shadow-lg ${isLeft ? 'right-4' : 'left-4'}`} />
-      </div>
-    </motion.div>
-  )
-}
-
-export default function HeroIntro({ onOpen, onComplete }) {
-  const [stage, setStage] = useState('initial')
-  const { t } = useLanguage()
-
-  const start = async () => {
-    if (stage !== 'initial') return
-    onOpen?.()
-    setStage('doors')
-    await wait(2500)
-    setStage('opening')
-    await wait(3000)
-    setStage('silhouettes')
-    await wait(2500)
-    setStage('text')
-    await wait(3500)
-    onComplete()
-  }
-
-  const opened = stage !== 'initial' && stage !== 'doors'
-
-  return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-maroon via-[#5a0000] to-[#3d0000] flex items-center justify-center">
-      <FallingPetals count={30} className="w-1 h-1 bg-gold opacity-50" minDur={5} spread={5} />
-      {opened && <FallingPetals count={20} className="w-2 h-2 bg-gold opacity-60" minDur={4} spread={3} />}
-
-      <div className="relative z-10 w-full max-w-md mx-auto px-4">
-        <div className="relative h-[400px] md:h-[500px] flex items-center justify-center -mt-12 md:mt-0">
-          {opened && (
-            <motion.div
-              className="absolute inset-0 rounded-full bg-gold/40 blur-3xl"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1.6, opacity: 0.5 }}
-              transition={{ duration: 1.5 }}
-            />
-          )}
-
-          <Door side="left" stage={stage} />
-          <Door side="right" stage={stage} />
-
-          {(stage === 'initial' || stage === 'doors' || stage === 'opening') && (
-            <motion.div
-              className="absolute z-30 w-32 h-32 md:w-40 md:h-40 pointer-events-none"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: stage === 'opening' ? 0 : 1, scale: stage === 'opening' ? 1.2 : 1 }}
-              transition={{ duration: 1 }}
-            >
-              <div className="w-full h-full p-2 bg-gradient-to-br from-maroon to-maroon-dark rounded-full border-4 border-gold shadow-2xl overflow-hidden flex items-center justify-center">
-                <video
-                  src={WEDDING.ganeshVideo}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-[180%] h-auto max-w-none"
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {stage === 'initial' && (
-            <motion.button
-              type="button"
-              className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg cursor-pointer"
-              onClick={start}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex flex-col items-center gap-3 p-8 bg-maroon/80 border-2 border-gold rounded-2xl shadow-2xl">
-                <p className="text-sm text-gold/90 tracking-widest">{t('intro.blessing')}</p>
-                <Sparkles className="w-8 h-8 text-gold animate-pulse" />
-                <p className="text-xl md:text-2xl text-gold font-serif tracking-widest text-center">{t('intro.tap')}</p>
-                <p className="text-sm text-gold/80 text-center font-light mt-1">{t('intro.sound')}</p>
-              </div>
-            </motion.button>
-          )}
-
-          {(stage === 'silhouettes' || stage === 'text') && (
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: stage === 'text' ? 0.35 : 1, scale: 1 }}
-              transition={{ duration: 1.5 }}
-            >
-              <div className="flex items-end gap-4">
-                <motion.div
-                  className="w-24 h-40 bg-gradient-to-b from-gold to-gold-dark rounded-t-full opacity-80"
-                  initial={{ x: -100, opacity: 0 }}
-                  animate={{ x: 0, opacity: 0.8 }}
-                  transition={{ duration: 1 }}
-                />
-                <motion.div initial={{ scale: 0 }} animate={{ scale: [0, 1.2, 1] }} transition={{ duration: 0.5, delay: 0.5 }}>
-                  <Heart className="w-8 h-8 text-gold fill-gold mb-20" />
-                </motion.div>
-                <motion.div
-                  className="w-32 h-48 bg-gradient-to-b from-gold to-gold-dark rounded-t-full opacity-80"
-                  initial={{ x: 100, opacity: 0 }}
-                  animate={{ x: 0, opacity: 0.8 }}
-                  transition={{ duration: 1 }}
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {stage === 'text' && (
-            <motion.div
-              className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center space-y-3"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-sm uppercase tracking-[0.3em] text-cream/80">{t('intro.ceremony')}</p>
-              <div className="space-y-1">
-                <h1 className="text-5xl md:text-6xl text-gold font-serif tracking-wider drop-shadow-lg">{t('bride.name')}</h1>
-                <p className="text-xs md:text-sm text-gold/80 tracking-wide px-4">{t('bride.parents')}</p>
-              </div>
-              <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}>
-                <Heart className="w-8 h-8 text-gold fill-gold mx-auto drop-shadow-lg" />
-              </motion.div>
-              <div className="space-y-1">
-                <h1 className="text-5xl md:text-6xl text-gold font-serif tracking-wider drop-shadow-lg">{t('groom.name')}</h1>
-                <p className="text-xs md:text-sm text-gold/80 tracking-wide px-4">{t('groom.parents')}</p>
-              </div>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="text-2xl text-cream font-light tracking-wide">
-                {t('hero.getting_married')}
-              </motion.p>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="text-lg text-gold">
-                {t('date.short')}
-              </motion.p>
-            </motion.div>
-          )}
-        </div>
+    <div className={`${size} rounded-full p-1.5 bg-gradient-to-br from-gold-light via-gold to-bronze shadow-[0_10px_40px_-10px_rgba(60,70,50,.5)]`}>
+      <div className="w-full h-full rounded-full overflow-hidden bg-olive-dark flex items-center justify-center border-2 border-ivory/70">
+        <video src={WEDDING.ganeshVideo} autoPlay loop muted playsInline className="w-[180%] h-auto max-w-none" />
       </div>
     </div>
   )
 }
+
+/** Full-screen cover shown before the guest taps to open the invitation */
+export function Cover({ onOpen }) {
+  const { t } = useLanguage()
+
+  // Lock page scroll while the cover is up
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[200] bg-grace flex items-center justify-center overflow-hidden px-6"
+      exit={{ opacity: 0, scale: 1.06, filter: 'blur(8px)' }}
+      transition={{ duration: 1.2, ease }}
+    >
+      <FallingLeaves count={10} />
+      <OliveBranch className="absolute top-6 left-1/2 -translate-x-1/2 w-64 opacity-70" />
+      <OliveBranch className="absolute bottom-6 left-1/2 -translate-x-1/2 w-64 opacity-70 rotate-180" />
+
+      {/* arch frame */}
+      <div className="absolute inset-x-6 inset-y-16 md:inset-x-[28%] rounded-t-full border border-moss/40 pointer-events-none" />
+      <div className="absolute inset-x-9 inset-y-[4.6rem] md:inset-x-[29%] rounded-t-full border border-bronze/25 pointer-events-none" />
+
+      <motion.div
+        className="relative z-10 flex flex-col items-center text-center gap-5"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.4, ease }}
+      >
+        <p className="font-caps text-xs md:text-sm tracking-[0.3em] text-bronze">{t('intro.blessing')}</p>
+        <Medallion />
+        <p className="font-caps text-xs tracking-[0.35em] uppercase text-sage">{t('intro.ceremony')}</p>
+        <h1 className="font-script text-5xl md:text-6xl text-olive text-glow leading-tight">
+          {t('bride.name')} <span className="text-3xl text-bronze">&amp;</span> {t('groom.name')}
+        </h1>
+        <HeartDivider color="#6b7d55" width="w-14" size={10} />
+
+        <motion.button
+          type="button"
+          onClick={onOpen}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          className="relative mt-2 px-9 py-3 rounded-full bg-sage text-ivory font-caps tracking-[0.25em] text-sm shadow-[0_10px_30px_-10px_rgba(60,70,50,.7)] border border-gold-light/50"
+        >
+          <motion.span
+            className="absolute inset-0 rounded-full border border-sage"
+            animate={{ scale: [1, 1.25], opacity: [0.6, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          {t('intro.tap')}
+        </motion.button>
+        <p className="text-sm italic text-sage/80">{t('intro.sound')}</p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/** First section of the invitation: names in script, revealed one after another */
+export function Hero({ opened }) {
+  const { t } = useLanguage()
+  const show = (delay, y = 24) => ({
+    initial: { opacity: 0, y },
+    animate: opened ? { opacity: 1, y: 0 } : { opacity: 0, y },
+    transition: { delay, duration: 1.1, ease },
+  })
+
+  return (
+    <section className="relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center bg-grace px-6">
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(247,242,230,.9) 0%, rgba(247,242,230,0) 65%)' }} />
+      <FallingLeaves count={14} />
+      <OliveBranch className="absolute -top-2 -left-10 w-72 md:w-96 rotate-[25deg] opacity-60" />
+      <OliveBranch className="absolute -top-2 -right-10 w-72 md:w-96 -scale-x-100 -rotate-[25deg] opacity-60" />
+      <OliveBranch className="absolute -bottom-2 -left-10 w-72 md:w-96 -rotate-[20deg] opacity-50" />
+      <OliveBranch className="absolute -bottom-2 -right-10 w-72 md:w-96 -scale-x-100 rotate-[20deg] opacity-50" />
+
+      <div className="relative z-10 -mt-10 flex flex-col items-center text-center">
+        <motion.div {...show(0.2, 0)} className="mb-3">
+          <Heart size={26} className="text-olive mx-auto" fill="currentColor" />
+        </motion.div>
+        <motion.p {...show(0.4, 14)} className="font-script text-2xl md:text-4xl text-olive text-glow whitespace-pre-line">
+          {t('hero.together')}
+        </motion.p>
+        <motion.div {...show(0.5, 0)} className="my-4">
+          <HeartDivider color="rgba(59,68,50,0.5)" width="w-16" size={10} />
+        </motion.div>
+        <motion.h1 {...show(0.6)} className="font-script text-7xl md:text-9xl leading-none text-olive text-glow">
+          {t('bride.name')}
+        </motion.h1>
+        <motion.p {...show(0.85, 0)} className="my-2 font-script text-4xl text-olive/80">&amp;</motion.p>
+        <motion.h1 {...show(1.05)} className="font-script text-7xl md:text-9xl leading-none text-olive text-glow">
+          {t('groom.name')}
+        </motion.h1>
+        <motion.p {...show(1.3, 10)} className="mt-6 font-caps tracking-[0.3em] text-sm md:text-base text-sage">
+          {t('hero.getting_married')}
+        </motion.p>
+        <motion.p {...show(1.45, 10)} className="mt-2 font-caps tracking-[0.25em] text-lg md:text-xl text-olive">
+          19 · 01 · 2027
+        </motion.p>
+      </div>
+
+      <AnimatePresence>
+        {opened && (
+          <motion.div
+            className="absolute inset-x-0 bottom-10 z-10 flex flex-col items-center gap-1 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, 8, 0] }}
+            transition={{ opacity: { delay: 1.8, duration: 0.8 }, y: { duration: 2, repeat: Infinity } }}
+          >
+            <span className="font-caps text-xs font-bold tracking-[0.35em] uppercase text-olive">{t('nav.scroll')}</span>
+            <ChevronDown size={26} strokeWidth={3} className="text-olive" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  )
+}
+
+export { Medallion }
